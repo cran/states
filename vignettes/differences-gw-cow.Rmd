@@ -1,0 +1,78 @@
+---
+title: "Country code differences to look out for"
+author: "Andreas Beger"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Country code differences to look out for}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library("states")
+library("dplyr")
+```
+
+Notes on common country code differences when comparing and merging different data sources. 
+
+## Between COW and G&W lists
+
+```{r}
+
+data("cowstates")
+data("gwstates")
+
+```
+
+How many COW country names are in G&W country names?
+
+```{r}
+table(cowstates$country_name %in% gwstates$country_name)
+```
+
+How many G&W country names are in COW country names?
+
+```{r}
+table(gwstates$country_name %in% cowstates$country)
+```
+
+There is more apparent overlap when we focus on country codes:
+
+```{r}
+cowstates %>% filter(!cowcode %in% gwstates$gwcode) %>%
+  knitr::kable(caption = "Country codes in COW but not in G&W")
+
+gwstates %>% filter(!gwcode %in% cowstates$cowcode) %>%
+  knitr::kable(caption = "Country codes in G&W but not in COW")
+```
+
+
+This is deceiving however. There are several country codes that refer to different countries in COW and G&W. Also, which code is retained for states after a split or merge is different in several cases. 
+
+- Germany after 1991 unification: COW uses 255, G&W continues 260
+- Yemen: COW has 678 for Yemen from 1926 to 1990, then 679 after unification; G&W uses 678 throughout, but independence is earlier. 
+- Kiribati: 970 in G&W, 946 in COW
+- Nauru: 971 in G&W, 970 in COW
+- Tuvalu: 973 in G&W, 947 in COW
+- Tonga: 972 in G&W, 955 in COW
+
+
+## G&W and WDI
+
+Some example code for converting WDI data to G&W:
+
+```r
+WDI(...) %>%
+  mutate(gwcode = countrycode(iso2c, "iso2c", "cown")) %>%
+  mutate(gwcode = case_when(
+           iso2c=="RS" ~ 340L,
+           iso2c=="XK" ~ 347L,
+           iso2c=="SS" ~ 626L,
+           gwcode==255L & year >= 1949 ~ 260L,
+           gwcode==679L ~ 678L,
+           TRUE ~ gwcode
+         ))
+```

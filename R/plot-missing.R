@@ -1,0 +1,136 @@
+#' Vizualize missing and non-proper cases for state panel data
+#'
+#' Plot missing values by country and date, and additionally identify country-date
+#' cases that do or do not match an independent state list.
+#'
+#' @param x Variable names(s), e.g. "x" or c("x1", "x2").
+#' @param data State panel data frame
+#' @param space Name of state identifier
+#' @param time Name of time identifier
+#' @param time_unit Temporal resolution character string, e.g. "year" or "month".
+#'     See details in \code{\link[base]{seq.Date}}.
+#' @param statelist Check not only missing values, but presence or absence of
+#'     observations against a list of independent states? "none" or "GW" or "COW".
+#'
+#' @details \code{missing_info} provides the information that is plotted with
+#'     \code{plot_missing}. The latter returns a ggplot, and thus can be chained
+#'     with other ggplot functions as usual.
+#'
+#' @export
+#' @importFrom grDevices hcl
+#' @examples
+#' cy <- state_panel(as.Date("1980-06-30"), as.Date("2015-06-30"), by = "year",
+#' useGW = TRUE)
+#' cy$myvar <- rnorm(nrow(cy))
+#' cy$myvar[sample(1:nrow(cy), nrow(cy)*.1, replace = FALSE)] <- NA
+#' str(cy)
+#'
+#' head(missing_info("myvar", cy, "gwcode", "date", "year", "none"))
+#' plot_missing("myvar", cy, "gwcode", "date", "year", "none")
+#'
+#' # Check data also against G&W list of independent states
+#' head(missing_info("myvar", cy, "gwcode", "date", "year", "GW"))
+#' plot_missing("myvar", cy, "gwcode", "date", "year", "GW")
+#'
+#' # To check all variables:
+#' # plot_missing(setdiff(colnames(df), "space", "time"), ...)
+plot_missing <- function(x, data, space, time, time_unit,
+                         statelist = c("none", "GW", "COW")) {
+  if (!statelist %in% c("none", "GW", "COW")) {
+    stop(sprintf("'%s' is not a valid option for 'statelist', use 'none', 'GW', or 'COW'",
+                 statelist))
+  }
+
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("ggplot2 needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+
+  mm <- missing_info(x, data, space, time, time_unit, statelist)
+
+  if (statelist %in% c("GW", "COW")) {
+    fill_values <- c("Complete, independent" = hcl(195, 100, 65), "Complete, non-independent" = hcl(15, 100, 20),
+                     "Missing values, independent"  = hcl(15, 100, 65), "Missing values, non-independent"  = hcl(15, 100, 45),
+                     "No observation, independent"   = hcl(15, 100, 85), "No observation, non-independent"   = hcl(15, 0, 97))
+  } else {
+    fill_values <-  c("Complete"         = grDevices::hcl(195, l=65, c=100),
+                      "Missing values"   = grDevices::hcl(15, l=65, c=100),
+                      "No observation"   = grDevices::hcl(15, l=97, c=0))
+  }
+
+  p <- ggplot2::ggplot(mm, ggplot2::aes_string(x = time, y = space, fill = "status")) +
+    ggplot2::geom_tile() +
+    ggplot2::scale_x_date(expand=c(0, 0)) +
+    ggplot2::scale_fill_manual("", drop = FALSE, values = fill_values) +
+    ggplot2::guides(fill = ggplot2::guide_legend(ncol = 2)) +
+    ggplot2::theme(legend.position = "bottom")
+  p
+}
+
+
+
+#' @export
+#' @rdname plot_missing
+#' @importFrom stats complete.cases
+missing_info <- function(x, data, space, time, time_unit, statelist = "none") {
+  if (any(is.na(data[, space]))) stop(paste0("Space identifier '", space, "' contains missing values."))
+  if (any(is.na(data[, time]))) stop(paste0("Space identifier '", time, "' contains missing values."))
+  if (!statelist %in% c("none", "GW", "COW")) stop("'none', 'GW', or 'COW'")
+  df <- as.data.frame(data)
+
+  # Create missingness logical vector
+  df[, "missing_value"] <- !stats::complete.cases(df[, x])
+  df <- df[, c(space, time, "missing_value")]
+
+  if (statelist=="none") {
+    if (!is.factor(df[, space])) df[, space] <- as.factor(df[, space])
+    space_range <- unique(df[, space])
+    time_range  <- seq.Date(from = min(data[, time]),
+                            to   = max(data[, time]),
+                            by   = time_unit
+    )
+    full_mat <- expand.grid(space_range, time_range)
+    colnames(full_mat) <- c(space, time)
+
+    full_mat$independent <- NA
+
+    full_mat <- dplyr::left_join(full_mat, df, by = c(space, time))
+    full_mat$status <- NA
+    full_mat$status[full_mat$missing_value==TRUE]  <- "Missing values"
+    full_mat$status[full_mat$missing_value==FALSE] <- "Complete"
+    full_mat$status[is.na(full_mat$missing_value)] <- "No observation"
+    stopifnot(!any(is.na(full_mat$status)))
+    full_mat$status <- factor(full_mat$status, levels = c("Complete", "Missing values", "No observation"))
+
+  } else {
+
+    ccname <- ifelse(statelist=="GW", "gwcode", "cowcode")
+    ind_states <- state_panel(min(df[, time]), max(df[, time]), by = time_unit, useGW = (statelist=="GW"))
+    colnames(ind_states)  <- c(space, time)
+    ind_states$independent <- 1
+
+    full_mat <- dplyr::full_join(ind_states, df, by = c(space, time))
+
+    full_mat$independent[is.na(full_mat$independent)] <- 0
+
+    full_mat$status[full_mat$missing_value==TRUE]  <- "Missing values"
+    full_mat$status[full_mat$missing_value==FALSE] <- "Complete"
+    full_mat$status[is.na(full_mat$missing_value)] <- "No observation"
+
+    full_mat$status <- paste(full_mat$status,
+                             ifelse(full_mat$independent,
+                                    "independent",
+                                    "non-independent"),
+                             sep = ", ")
+    lvls        <- as.vector(
+      outer(c("Complete", "Missing values", "No observation"),
+      c("independent", "non-independent"), paste, sep = ", ")
+      )
+    full_mat$status <- factor(full_mat$status, levels = lvls)
+  }
+
+  # Reorder for ggplot2 plotting
+  full_mat[, space] <- factor(full_mat[, space], levels = rev(sort(unique(full_mat[, space]))))
+  full_mat
+}
+
