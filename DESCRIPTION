@@ -1,7 +1,7 @@
 Package: states
 Type: Package
 Title: Create Panels of Independent States
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: person("Andreas", "Beger", role = c("cre", "aut"), email =
     "adbeger@gmail.com", comment = c(ORCID = "0000-0003-1883-3169"))
 Maintainer: Andreas Beger <adbeger@gmail.com>
@@ -20,7 +20,7 @@ VignetteBuilder: knitr
 URL: https://github.com/andybega/states, https://andybeger.com/states
 BugReports: https://github.com/andybega/states/issues
 NeedsCompilation: no
-Packaged: 2018-02-23 11:56:43 UTC; andybega
+Packaged: 2018-05-04 08:58:24 UTC; andybega
 Author: Andreas Beger [cre, aut] (<https://orcid.org/0000-0003-1883-3169>)
 Repository: CRAN
-Date/Publication: 2018-02-23 19:03:00 UTC
+Date/Publication: 2018-05-04 09:09:42 UTC
