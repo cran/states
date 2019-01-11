@@ -5,39 +5,48 @@
 \alias{missing_info}
 \title{Visualize missing and non-proper cases for state panel data}
 \usage{
-plot_missing(x, data, space, time, time_unit, statelist = c("none", "GW",
-  "COW"), skip_labels = 5)
+plot_missing(data, x = NULL, space = NULL, time = "date",
+  period = "year", statelist = "none", skip_labels = 5,
+  partial = "exact")
 
-missing_info(x, data, space, time, time_unit, statelist = "none")
+missing_info(data, x = NULL, space = NULL, time = "date",
+  period = "year", statelist = "none", partial = "exact")
 }
 \arguments{
-\item{x}{Variable names(s), e.g. "x" or c("x1", "x2").}
-
 \item{data}{State panel data frame}
 
-\item{space}{Name of variable identifying state country codes.}
+\item{x}{Variable names(s), e.g. "x" or c("x1", "x2"). Default is NULL, in
+which case all columns expect the space and time ID columns will be used.}
+
+\item{space}{Name of variable identifying state country codes. If NULL
+(default) and one of "gwcode" or "cowcode" is a column in the data, it
+will be used.}
 
 \item{time}{Name of time identifier, the corresponding variables needs to be
-Date class.}
+Date class. Default is "date".}
 
-\item{time_unit}{Temporal resolution character string, e.g. "year" or "month".
-See details in \code{\link[base]{seq.Date}}.}
+\item{period}{Temporal resolution character string, e.g. "year" or "month".
+See details in \code{\link[base]{seq.Date}}. Default is "year".}
 
 \item{statelist}{Check not only missing values, but presence or absence of
 observations against a list of independent states? "none" or "GW" or "COW".}
 
 \item{skip_labels}{Only plot the label for every n-th country on the y-axis
 to avoid overplotting.}
+
+\item{partial}{Option for how to handle edge cases where a state is independent
+for only part of a time period (year, month, etc.). Options include
+"exact", and "any". See \code{\link[=state_panel]{state_panel()}} for details.}
 }
 \value{
 \code{plot_missing} returns a ggplot2 object.
 
-  \code{missing_info} returns a data frame with components:
-  \item{[space]}{Space identifier, with name equal to the "space" argument, e.g. "ccode".}
-  \item{[time]}{Time identifier, with name equal to the "time" argument, e.g. "date".}
-  \item{independent}{A logical vector, is the statelist argument is none, NA.}
-  \item{missing_value}{A logical vector indicating if that record has missing values}
-  \item{status}{The label used for plotting, combining the independence and missing value information for a case as appropriate.}
+\code{missing_info} returns a data frame with components:
+\item{space}{Space identifier, with name equal to the "space" argument, e.g. "ccode".}
+\item{time}{Time identifier, with name equal to the "time" argument, e.g. "date".}
+\item{independent}{A logical vector, is the statelist argument is none, NA.}
+\item{missing_value}{A logical vector indicating if that record has missing values}
+\item{status}{The label used for plotting, combining the independence and missing value information for a case as appropriate.}
 }
 \description{
 Plot missing values by country and date, and additionally identify country-date
@@ -45,8 +54,8 @@ cases that do or do not match an independent state list.
 }
 \details{
 \code{missing_info} provides the information that is plotted with
-    \code{plot_missing}. The latter returns a ggplot, and thus can be chained
-    with other ggplot functions as usual.
+\code{plot_missing}. The latter returns a ggplot, and thus can be chained
+with other ggplot functions as usual.
 }
 \examples{
 # Create an example data frame with missing values
@@ -77,16 +86,16 @@ plot_missing("myvar", cy, "gwcode", "date", "year", "GW")
 data("polity")
 head(polity)
 polity$date <- as.Date(paste0(polity$year, "-12-31"))
-plot_missing("polity", polity, "ccode", "date", "year", "COW")
+plot_missing(polity, "polity", "ccode", "date", "year", "COW")
 # COW starts in 1816; Polity has excess data for several non-independent
 # states after that date, and is missing coverage for several countries.
 
 # The date option is relevant for years in which states gain or lose
 # independence, so this will be slighlty different:
 polity$date <- as.Date(paste0(polity$year, "-01-01"))
-plot_missing("polity", polity, "ccode", "date", "year", "COW")
+plot_missing(polity, "polity", "ccode", "date", "year", "COW")
 
 # plot_missing returns a ggplot2 object, so you can do anything you want
-plot_missing("polity", polity, "ccode", "date", "year", "COW") +
+plot_missing(polity, "polity", "ccode", "date", "year", "COW") +
   ggplot2::coord_flip()
 }
