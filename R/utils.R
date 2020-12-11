@@ -1,36 +1,57 @@
-#' Identify date sequences
+#' Parse date
 #'
-#' For correctly plotting country-time period spells
+#' Try to parse input as a date
 #'
-#' @param x a Date sequence
-#' @param pd what is the time aggregation period in the data?
-#'
-#' @export
+#' @param x a integer or character vector, see examples
 #'
 #' @examples
-#' library("ggplot2")
-#' d1 <- as.Date("2018-01-01")
-#' d2 <- as.Date("2025-01-01")
-#' seq1 <- seq(d1, d2, by = "year")
-#' data.frame(seq1, id=id_date_sequence(seq1, "year"))
-#' # With a gap, should be two ids
-#' df <- data.frame(date = seq1[-4], id=id_date_sequence(seq1[-4], "year"), cowcode = 999)
-#' df
+#' parse_date(2006)
+#' parse_date("2006")
+#' parse_date("2006-06")
+#' parse_date("2006-06-01")
+#' parse_date(as.Date("2006-06-01"))
 #'
-#' # The point is to plot countries with interrupted independence correctly:
-#' df$y <- c(rep(1, 3), rep(2, 4))
-#' df$id <- paste0(df$cowcode, df$id)
-#' df
-#' ggplot(df, aes(x = date, y = y, group = cowcode)) + geom_line()
-#' ggplot(df, aes(x = date, y = y, group = id)) + geom_line()
-id_date_sequence <- function(x, pd) {
-  diff_days <- diff(x)
-  divisor <- NA
-  if (pd=="month") divisor <- 365.25/12
-  if (pd=="week") divisor <- 7
-  if (pd=="year") divisor <- 365.25
-  if (pd=="day") divisor <- 1
-  if (is.na(divisor)) stop("Did not recognize time period")
-  xx <- c(1, round(diff_days / divisor))
-  cumsum(xx!=1) + 1
+#' @export
+parse_date <- function(x) {
+
+  if (methods::is(x, "Date")) {
+    return(x)
+  }
+
+  period <- sapply(x, id_period)
+  if (length(unique(period)) > 1) {
+    stop(sprintf("Found multiple implied time periods (%s)",
+                 paste(period, collapse = ", ")))
+  }
+  period <- unique(period)
+
+  if (period=="year") {
+    return(as.Date(sprintf("%s-01-01", x)))
+  }
+
+  if (period=="month") {
+    return(as.Date(sprintf("%s-01", x), format = "%Y-%m-%d"))
+  }
+
+  if (period=="day") {
+    return(as.Date(x, format = "%Y-%m-%d"))
+  }
+
+  err_msg <- sprintf("Could not identify date for ['%s']", paste0(x, collapse = "', '"))
+  stop(err_msg)
+
+}
+
+
+#' ID time period
+#'
+#' Try to ID the time period implied by input format
+#'
+#' @keywords internal
+id_period <- function(x) {
+  stopifnot(length(x)==1)
+  if (grepl("^[0-9]{4}$", x)) return("year")
+  if (grepl("^[0-9]{4}-[0-9]{1,2}$", x)) return("month")
+  if (grepl("^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$", x)) return("day")
+  stop("Could not identify implied period")
 }

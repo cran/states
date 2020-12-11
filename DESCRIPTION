@@ -1,7 +1,7 @@
 Package: states
 Type: Package
 Title: Create Panels of Independent States
-Version: 0.2.2
+Version: 0.3.0
 Authors@R: person("Andreas", "Beger", role = c("cre", "aut"), email =
     "adbeger@gmail.com", comment = c(ORCID = "0000-0003-1883-3169"))
 Maintainer: Andreas Beger <adbeger@gmail.com>
@@ -14,14 +14,16 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 2.10)
-Imports: dplyr
-Suggests: testthat, ggplot2, stringr, knitr, rmarkdown, covr
-RoxygenNote: 6.1.1
+Imports: dplyr, rlang, methods, lifecycle
+Suggests: testthat (>= 2.1.0), ggplot2, stringr, knitr, rmarkdown,
+        covr, pkgdown, DT
+RoxygenNote: 7.1.1
 VignetteBuilder: knitr
-URL: https://github.com/andybega/states, https://andybeger.com/states
+URL: https://github.com/andybega/states,
+        https://www.andybeger.com/states/
 BugReports: https://github.com/andybega/states/issues
 NeedsCompilation: no
-Packaged: 2019-01-11 13:55:05 UTC; andybega
+Packaged: 2020-12-11 09:25:47 UTC; andybega
 Author: Andreas Beger [cre, aut] (<https://orcid.org/0000-0003-1883-3169>)
 Repository: CRAN
-Date/Publication: 2019-01-11 14:10:03 UTC
+Date/Publication: 2020-12-11 10:00:02 UTC

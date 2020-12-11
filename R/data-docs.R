@@ -11,18 +11,20 @@
 #'
 #' @format Data frame
 #' \describe{
-#'  \item{\code{gwcode}}{Gleditsch and Ward country code.}
-#'  \item{\code{iso3c}}{ISO 3 character country code.}
-#'  \item{\code{country_name}}{Long form country name}
-#'  \item{\code{start}}{Country start of independence.}
-#'  \item{\code{end}}{Country end of independence.}
-#'  \item{\code{microstate}}{Logical flag for whether state is a microstates with less than 250,000 population.}
+#'  \item{`gwcode`}{Gleditsch and Ward country code.}
+#'  \item{`gwc`}{G&W character country code. This is derived from the COW character codes.}
+#'  \item{`country_name`}{Long form country name}
+#'  \item{`start`}{Country start of independence.}
+#'  \item{`end`}{Country end of independence.}
+#'  \item{`microstate`}{Logical flag for whether state is a microstates with less than 250,000 population.}
 #'}
 #'
-#' @source
-#' Gleditsch, Kristian S. and Michael D. Ward. 1999. ``Interstate System
-#' Membership: A Revised List of the Independent States since 1816."
-#' International Interactions 25.
+#' @source [http://ksgleditsch.com/data-4.html](http://ksgleditsch.com/data-4.html)
+#'
+#' @references
+#' Gleditsch, Kristian S. and Michael D. Ward. 1999. "Interstate System
+#'   Membership: A Revised List of the Independent States since 1816."
+#'   *International Interactions* 25.
 #'
 #' @examples
 #' data(gwstates)
@@ -43,17 +45,17 @@
 #'
 #' @format Data frame
 #' \describe{
-#'  \item{\code{ccode}}{Gleditsch and Ward country code.}
-#'  \item{\code{iso3c}}{ISO 3 character country code.}
-#'  \item{\code{country_name}}{Long form country name}
-#'  \item{\code{start}}{Country start of independence.}
-#'  \item{\code{end}}{Country end of independence.}
-#'  \item{\code{microstate}}{Logical flag for whether state is a microstates with less than 250,000 population.}
+#'  \item{`ccode`}{Gleditsch and Ward country code.}
+#'  \item{`cowc`}{ISO 3 character country code.}
+#'  \item{`country_name`}{Long form country name}
+#'  \item{`start`}{Country start of independence.}
+#'  \item{`end`}{Country end of independence.}
+#'  \item{`microstate`}{Logical flag for whether state is a microstates with less than 250,000 population.}
 #'}
 #'
 #' @source
 #' Correlates of War Project. 2011. "State System Membership List, v2011."
-#' Online, http://correlatesofwar.org
+#'   Online, [https://correlatesofwar.org](https://correlatesofwar.org)
 #'
 #' @examples
 #' data(cowstates)
@@ -79,14 +81,14 @@
 #'
 #' @format Data frame
 #' \describe{
-#'  \item{\code{ccode}}{Correlates of War (COW) country code.}
-#'  \item{\code{year}}{Year of the observation.}
-#'  \item{\code{polity}}{Combined Polity score.}
+#'  \item{`ccode`}{Correlates of War (COW) country code.}
+#'  \item{`year`}{Year of the observation.}
+#'  \item{`polity`}{Combined Polity score.}
 #'}
 #'
 #' @source
 #' Marshall, Monty G., Ted Robert Gurr, and Keith Jaggers. 2017. ``Polity IV
-#'   Project: Dataset Users' Manual.'' http://www.systemicpeace.org/inscr/p4manualv2016.pdf
+#'   Project: Dataset Users' Manual.'' [http://www.systemicpeace.org/inscr/p4manualv2016.pdf]( http://www.systemicpeace.org/inscr/p4manualv2016.pdf)
 #'
 #' @examples
 #' data("polity")
@@ -129,7 +131,7 @@ sfind <- function(x, list = "both") {
 
   slist <- rbind(
     cbind(list = "GW", gwstates),
-    cbind(list = "COW", cowstates, microstate = NA)
+    cbind(list = "COW", cowstates)
   )
   slist$search_string <- paste0(slist$code3c, ";", slist$country_name)
   slist$search_string <- tolower(slist$search_string)
