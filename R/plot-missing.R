@@ -138,7 +138,8 @@ plot_missing <- function(data, x = NULL, ccode = NULL, time = NULL,
   brks <- sort(unique(mm[, ccode]), decreasing = T)
   brks <- brks[seq(1, length(brks), by = skip_labels)]
 
-  p <- ggplot2::ggplot(mm, ggplot2::aes_string(x = time, y = ccode, fill = "status")) +
+  p <- ggplot2::ggplot(mm, ggplot2::aes(x = .data[[time]], y = .data[[ccode]],
+                                        fill = "status")) +
     ggplot2::geom_tile() +
     ggplot2::scale_y_discrete(breaks = brks) +
     ggplot2::scale_x_date(expand=c(0, 0)) +
@@ -333,6 +334,7 @@ missing_info <- function(data, x = NULL, ccode = NULL, time = NULL,
 #'
 #' @param data data.frame
 #' @param x string
+#' @keywords internal
 .warner <- function(data, x) {
   if (inherits(x, "data.frame") & class(data)[1]=="character") {
     warning("The order of the 'data' and 'x' arguments has switched, please adjust code accordingly.\nplot_missing(data, x, ...)\nmissing_info(data, x, ...)")

@@ -5,12 +5,11 @@
 
 <!-- badges: start -->
 
-[![R build
-status](https://github.com/andybega/states/workflows/R-CMD-check/badge.svg)](https://github.com/andybega/states/actions)
 [![CRAN
 versions](http://www.r-pkg.org/badges/version/states)](https://cran.r-project.org/package=states)
 [![Coverage
-status](https://codecov.io/gh/andybega/states/branch/master/graph/badge.svg)](https://codecov.io/github/andybega/states?branch=master)
+status](https://codecov.io/gh/andybega/states/branch/master/graph/badge.svg)](https://app.codecov.io/github/andybega/states?branch=master)
+[![R-CMD-check](https://github.com/andybega/states/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/andybega/states/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 Create country-year/month/day panels consistent with the COW or
@@ -28,8 +27,8 @@ merging different data sources:
 
 What the package does:
 
--   It contains the Gleditsch and Ward (G&W) as well as the Correlates
-    of War (COW) state system membership lists.
+- It contains the Gleditsch and Ward (G&W) as well as the Correlates of
+  War (COW) state system membership lists.
 
 ``` r
 library("states")
@@ -38,7 +37,7 @@ data(gwstates)
 data(cowstates)
 ```
 
--   Search them with `sfind`, this can be helpful for manual coding:
+- Search them with `sfind`, this can be helpful for manual coding:
 
 ``` r
 sfind(260)[, 1:6]
@@ -56,8 +55,8 @@ sfind("German")[, 1:6]
 #> 300  COW   265    GDR German Democratic Republic 1954-03-25 1990-10-02
 ```
 
--   You can use it to build a country-year template that matches either
-    the COW or G&W state lists.
+- You can use it to build a country-year template that matches either
+  the COW or G&W state lists.
 
 ``` r
 countries <- state_panel(1991, 2001)
@@ -68,9 +67,9 @@ str(countries)
 #>  $ year  : int  1991 1992 1993 1994 1995 1996 1997 1998 1999 2000 ...
 ```
 
--   Visualize missing/non-independent cases in your data. See this
-    related [blog post for more
-    details](https://www.andybeger.com/2016/09/14/data-management-and-missing-data/).
+- Visualize missing/non-independent cases in your data. See this related
+  [blog post for more
+  details](https://www.andybeger.com/blog/2016-09-13-data-management/).
 
 ``` r
 data("polity")
@@ -120,15 +119,14 @@ remotes::install_github("andybega/states")
 ## Citations
 
 For the [Gleditsch and Ward (G&W) state
-data](http://privatewww.essex.ac.uk/~ksg/statelist.html):
+data](http://ksgleditsch.com/statelist.html):
 
 Gleditsch, Kristian S. & Michael D. Ward. 1999. “Interstate System
 Membership: A Revised List of the Independent States since 1816.”
 International Interactions 25: 393-413.
 
 For the [Correlates of War (COW) state
-data](https://correlatesofwar.org/data-sets/state-system-membership):
+data](https://correlatesofwar.org/data-sets/state-system-membership/):
 
 Correlates of War Project. 2017. “State System Membership List, v2016.”
-Online,
-<a href="https://correlatesofwar.org" class="uri">https://correlatesofwar.org</a>
+Online, <https://correlatesofwar.org>
